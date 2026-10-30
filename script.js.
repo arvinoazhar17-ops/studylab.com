@@ -1,9 +1,11 @@
 "use strict";
 
 // ========================================
-// STUDYLAB AI — CORE FUNCTIONALITY
-// PART 2A + PART 2B + PART 2C
+// STUDYLAB AI — CLIENT-SIDE INTEGRATION
 // ========================================
+
+// 🔑 MASUKKAN API KEY OPENAI KAMU DI SINI:
+const OPENAI_API_KEY = "sk-proj-MASUKKAN_API_KEY_OPENAI_KAMU_DISINI";
 
 
 // ========================================
@@ -36,7 +38,6 @@ function closeMobileMenu() {
   menuToggle.setAttribute("aria-expanded", "false");
   menuToggle.setAttribute("aria-label", "Buka menu navigasi");
 
-  // Disesuaikan dengan CSS.
   navLinks.classList.remove("active");
   menuToggle.classList.remove("is-active");
 }
@@ -44,11 +45,9 @@ function closeMobileMenu() {
 function toggleMobileMenu() {
   if (!menuToggle || !navLinks) return;
 
-  const isExpanded =
-    menuToggle.getAttribute("aria-expanded") === "true";
+  const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
 
   menuToggle.setAttribute("aria-expanded", String(!isExpanded));
-
   menuToggle.setAttribute(
     "aria-label",
     isExpanded ? "Buka menu navigasi" : "Tutup menu navigasi"
@@ -83,16 +82,13 @@ if (menuToggle && navLinks) {
 // 3. NAVIGATION ACTIVE STATE
 // ========================================
 
-const allNavLinks = document.querySelectorAll(
-  '.nav-links a[href^="#"]'
-);
+const allNavLinks = document.querySelectorAll('.nav-links a[href^="#"]');
 
 allNavLinks.forEach((link) => {
   link.addEventListener("click", () => {
     allNavLinks.forEach((item) => {
       item.classList.remove("active");
     });
-
     link.classList.add("active");
   });
 });
@@ -107,18 +103,9 @@ function updateCharacterCount() {
 
   const totalCharacters = materiInput.value.length;
 
-  characterCount.textContent =
-    `${totalCharacters.toLocaleString("id-ID")} karakter`;
-
-  characterCount.classList.toggle(
-    "is-empty",
-    totalCharacters === 0
-  );
-
-  characterCount.classList.toggle(
-    "is-valid",
-    totalCharacters >= 20
-  );
+  characterCount.textContent = `${totalCharacters.toLocaleString("id-ID")} karakter`;
+  characterCount.classList.toggle("is-empty", totalCharacters === 0);
+  characterCount.classList.toggle("is-valid", totalCharacters >= 20);
 }
 
 if (materiInput) {
@@ -133,7 +120,6 @@ if (materiInput) {
 
 if (generatorForm && !formStatus) {
   formStatus = document.createElement("p");
-
   formStatus.id = "formStatus";
   formStatus.className = "form-status";
   formStatus.setAttribute("role", "status");
@@ -155,38 +141,21 @@ function showFormStatus(message, type = "info") {
 // ========================================
 
 function getStudySettings() {
-  if (
-    !materiInput ||
-    !questionType ||
-    !questionCount ||
-    !difficulty
-  ) {
-    showFormStatus(
-      "Form latihan tidak ditemukan. Periksa kembali HTML.",
-      "error"
-    );
-
+  if (!materiInput || !questionType || !questionCount || !difficulty) {
+    showFormStatus("Form latihan tidak ditemukan. Periksa kembali HTML.", "error");
     return null;
   }
 
   const materi = materiInput.value.trim();
 
   if (materi.length < 20) {
-    showFormStatus(
-      "Masukkan materi minimal 20 karakter.",
-      "error"
-    );
-
+    showFormStatus("Masukkan materi minimal 20 karakter.", "error");
     materiInput.focus();
     return null;
   }
 
   if (materi.length > 15000) {
-    showFormStatus(
-      "Materi terlalu panjang. Maksimal 15.000 karakter.",
-      "error"
-    );
-
+    showFormStatus("Materi terlalu panjang. Maksimal 15.000 karakter.", "error");
     materiInput.focus();
     return null;
   }
@@ -194,11 +163,7 @@ function getStudySettings() {
   const jumlahSoal = Number(questionCount.value);
 
   if (![5, 10, 15, 20].includes(jumlahSoal)) {
-    showFormStatus(
-      "Jumlah soal tidak valid.",
-      "error"
-    );
-
+    showFormStatus("Jumlah soal tidak valid.", "error");
     return null;
   }
 
@@ -264,50 +229,24 @@ function validateQuestions(questions) {
   }
 
   questions.forEach((question, index) => {
-    if (
-      typeof question.question !== "string" ||
-      !question.question.trim()
-    ) {
-      throw new Error(
-        `Pertanyaan nomor ${index + 1} tidak valid.`
-      );
+    if (typeof question.question !== "string" || !question.question.trim()) {
+      throw new Error(`Pertanyaan nomor ${index + 1} tidak valid.`);
     }
 
-    if (
-      !Array.isArray(question.options) ||
-      question.options.length !== 4
-    ) {
-      throw new Error(
-        `Soal nomor ${index + 1} harus memiliki 4 pilihan.`
-      );
+    if (!Array.isArray(question.options) || question.options.length !== 4) {
+      throw new Error(`Soal nomor ${index + 1} harus memiliki 4 pilihan.`);
     }
 
-    if (
-      !question.options.every(
-        option => typeof option === "string" && option.trim()
-      )
-    ) {
-      throw new Error(
-        `Pilihan soal nomor ${index + 1} tidak valid.`
-      );
+    if (!question.options.every(option => typeof option === "string" && option.trim())) {
+      throw new Error(`Pilihan soal nomor ${index + 1} tidak valid.`);
     }
 
-    if (
-      !Number.isInteger(question.answer) ||
-      question.answer < 0 ||
-      question.answer > 3
-    ) {
-      throw new Error(
-        `Kunci jawaban nomor ${index + 1} tidak valid.`
-      );
+    if (!Number.isInteger(question.answer) || question.answer < 0 || question.answer > 3) {
+      throw new Error(`Kunci jawaban nomor ${index + 1} tidak valid.`);
     }
 
-    if (
-      typeof question.explanation !== "string"
-    ) {
-      throw new Error(
-        `Pembahasan soal nomor ${index + 1} tidak valid.`
-      );
+    if (typeof question.explanation !== "string") {
+      throw new Error(`Pembahasan soal nomor ${index + 1} tidak valid.`);
     }
   });
 
@@ -321,11 +260,7 @@ function validateQuestions(questions) {
 
 function startQuiz(questions, settings = {}) {
   try {
-    if (
-      !quizSection ||
-      !quizCard ||
-      !quizResult
-    ) {
+    if (!quizSection || !quizCard || !quizResult) {
       throw new Error("Bagian kuis tidak ditemukan di HTML.");
     }
 
@@ -339,10 +274,8 @@ function startQuiz(questions, settings = {}) {
     }));
 
     quizSettings = settings;
-
     currentQuestionIndex = 0;
     userAnswers = Array(quizQuestions.length).fill(null);
-
     quizFinished = false;
 
     quizSection.hidden = false;
@@ -353,13 +286,11 @@ function startQuiz(questions, settings = {}) {
     const quizDescription = document.getElementById("quizDescription");
 
     if (quizTitle) {
-      quizTitle.textContent =
-        "Latihan " + (settings.jenisSoal || "soal");
+      quizTitle.textContent = "Latihan " + (settings.jenisSoal || "soal");
     }
 
     if (quizDescription) {
-      quizDescription.textContent =
-        `${quizQuestions.length} soal · ${settings.kesulitan || "Latihan mandiri"}`;
+      quizDescription.textContent = `${quizQuestions.length} soal · ${settings.kesulitan || "Latihan mandiri"}`;
     }
 
     renderQuestion();
@@ -374,7 +305,6 @@ function startQuiz(questions, settings = {}) {
   } catch (error) {
     console.error("Quiz error:", error);
     showFormStatus(error.message, "error");
-
     return false;
   }
 }
@@ -385,54 +315,31 @@ function startQuiz(questions, settings = {}) {
 // ========================================
 
 function renderQuestion() {
-  if (
-    !quizQuestions.length ||
-    quizFinished
-  ) {
-    return;
-  }
+  if (!quizQuestions.length || quizFinished) return;
 
   if (
-    !questionText ||
-    !questionLabel ||
-    !answerOptions ||
-    !answerFeedback ||
-    !questionProgress ||
-    !answeredProgress ||
-    !previousQuestion ||
-    !nextQuestion
+    !questionText || !questionLabel || !answerOptions ||
+    !answerFeedback || !questionProgress || !answeredProgress ||
+    !previousQuestion || !nextQuestion
   ) {
-    showFormStatus(
-      "Elemen kuis belum lengkap. Periksa HTML.",
-      "error"
-    );
-
+    showFormStatus("Elemen kuis belum lengkap. Periksa HTML.", "error");
     return;
   }
 
   const question = quizQuestions[currentQuestionIndex];
   const selectedAnswer = userAnswers[currentQuestionIndex];
 
-  questionLabel.textContent =
-    `PERTANYAAN ${String(currentQuestionIndex + 1).padStart(2, "0")}`;
-
+  questionLabel.textContent = `PERTANYAAN ${String(currentQuestionIndex + 1).padStart(2, "0")}`;
   questionText.textContent = question.question;
 
   answerOptions.replaceChildren();
 
   question.options.forEach((option, index) => {
     const button = document.createElement("button");
-
     button.type = "button";
     button.className = "answer-option";
-
-    button.textContent =
-      `${String.fromCharCode(65 + index)}. ${option}`;
-
-    button.setAttribute(
-      "aria-pressed",
-      String(selectedAnswer === index)
-    );
+    button.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
+    button.setAttribute("aria-pressed", String(selectedAnswer === index));
 
     if (selectedAnswer === index) {
       button.classList.add("is-selected");
@@ -440,41 +347,29 @@ function renderQuestion() {
 
     button.addEventListener("click", () => {
       if (quizFinished) return;
-
       userAnswers[currentQuestionIndex] = index;
-
       renderQuestion();
     });
 
     answerOptions.appendChild(button);
   });
 
-  const answered = userAnswers.filter(
-    answer => answer !== null
-  ).length;
+  const answered = userAnswers.filter(answer => answer !== null).length;
 
-  questionProgress.textContent =
-    `Soal ${currentQuestionIndex + 1} dari ${quizQuestions.length}`;
+  questionProgress.textContent = `Soal ${currentQuestionIndex + 1} dari ${quizQuestions.length}`;
+  answeredProgress.textContent = `${answered} dijawab`;
 
-  answeredProgress.textContent =
-    `${answered} dijawab`;
-
-  const progress =
-    ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
+  const progress = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
 
   if (quizProgressFill) {
     quizProgressFill.style.width = `${progress}%`;
   }
 
   if (quizProgressBar) {
-    quizProgressBar.setAttribute(
-      "aria-valuenow",
-      String(Math.round(progress))
-    );
+    quizProgressBar.setAttribute("aria-valuenow", String(Math.round(progress)));
   }
 
-  previousQuestion.disabled =
-    currentQuestionIndex === 0;
+  previousQuestion.disabled = currentQuestionIndex === 0;
 
   nextQuestion.textContent =
     currentQuestionIndex === quizQuestions.length - 1
@@ -494,10 +389,7 @@ function renderQuestion() {
 
 if (previousQuestion) {
   previousQuestion.addEventListener("click", () => {
-    if (
-      currentQuestionIndex > 0 &&
-      !quizFinished
-    ) {
+    if (currentQuestionIndex > 0 && !quizFinished) {
       currentQuestionIndex--;
       renderQuestion();
     }
@@ -510,10 +402,8 @@ if (nextQuestion) {
 
     if (userAnswers[currentQuestionIndex] === null) {
       if (answerFeedback) {
-        answerFeedback.textContent =
-          "Pilih jawaban terlebih dahulu sebelum melanjutkan.";
+        answerFeedback.textContent = "Pilih jawaban terlebih dahulu sebelum melanjutkan.";
       }
-
       return;
     }
 
@@ -537,15 +427,11 @@ function finishQuiz() {
   quizFinished = true;
 
   const correct = quizQuestions.filter(
-    (question, index) =>
-      userAnswers[index] === question.answer
+    (question, index) => userAnswers[index] === question.answer
   ).length;
 
   const total = quizQuestions.length;
-
-  const score = Math.round(
-    (correct / total) * 100
-  );
+  const score = Math.round((correct / total) * 100);
 
   if (quizCard) quizCard.hidden = true;
   if (quizResult) quizResult.hidden = false;
@@ -555,8 +441,7 @@ function finishQuiz() {
   }
 
   if (resultSummary) {
-    resultSummary.textContent =
-      `Kamu menjawab ${correct} dari ${total} soal dengan benar.`;
+    resultSummary.textContent = `Kamu menjawab ${correct} dari ${total} soal dengan benar.`;
   }
 
   renderAnswerReview();
@@ -589,46 +474,32 @@ function renderAnswerReview() {
 
   quizQuestions.forEach((question, index) => {
     const item = document.createElement("article");
-
     const heading = document.createElement("h4");
     const userAnswer = document.createElement("p");
     const correctAnswer = document.createElement("p");
     const explanation = document.createElement("p");
 
-    const isCorrect =
-      userAnswers[index] === question.answer;
+    const isCorrect = userAnswers[index] === question.answer;
 
     item.className = "answer-review-item";
 
-    heading.textContent =
-      `${index + 1}. ${question.question}`;
+    heading.textContent = `${index + 1}. ${question.question}`;
 
-    userAnswer.textContent =
-      `Jawabanmu: ${
-        userAnswers[index] === null
-          ? "Tidak dijawab"
-          : question.options[userAnswers[index]]
-      }`;
+    userAnswer.textContent = `Jawabanmu: ${
+      userAnswers[index] === null
+        ? "Tidak dijawab"
+        : question.options[userAnswers[index]]
+    }`;
 
-    correctAnswer.textContent =
-      `Jawaban benar: ${question.options[question.answer]}`;
+    correctAnswer.textContent = `Jawaban benar: ${question.options[question.answer]}`;
 
-    explanation.textContent =
-      question.explanation
-        ? `Pembahasan: ${question.explanation}`
-        : "Pembahasan belum tersedia.";
+    explanation.textContent = question.explanation
+      ? `Pembahasan: ${question.explanation}`
+      : "Pembahasan belum tersedia.";
 
-    item.classList.add(
-      isCorrect ? "is-correct" : "is-incorrect"
-    );
+    item.classList.add(isCorrect ? "is-correct" : "is-incorrect");
 
-    item.append(
-      heading,
-      userAnswer,
-      correctAnswer,
-      explanation
-    );
-
+    item.append(heading, userAnswer, correctAnswer, explanation);
     answerReview.appendChild(item);
   });
 }
@@ -658,10 +529,7 @@ function saveQuizHistory(entry) {
     renderQuizHistory();
 
   } catch (error) {
-    console.error(
-      "Riwayat tidak dapat disimpan:",
-      error
-    );
+    console.error("Riwayat tidak dapat disimpan:", error);
   }
 }
 
@@ -671,11 +539,8 @@ function saveQuizHistory(entry) {
 // ========================================
 
 function renderQuizHistory() {
-  const historyList =
-    document.getElementById("historyList");
-
-  const historyEmpty =
-    document.getElementById("historyEmpty");
+  const historyList = document.getElementById("historyList");
+  const historyEmpty = document.getElementById("historyEmpty");
 
   if (!historyList || !historyEmpty) return;
 
@@ -689,7 +554,6 @@ function renderQuizHistory() {
     if (!Array.isArray(history) || history.length === 0) {
       historyEmpty.hidden = false;
       historyList.hidden = true;
-
       return;
     }
 
@@ -698,7 +562,6 @@ function renderQuizHistory() {
 
     history.forEach(entry => {
       const card = document.createElement("article");
-
       const title = document.createElement("h3");
       const detail = document.createElement("p");
       const score = document.createElement("strong");
@@ -714,16 +577,11 @@ function renderQuizHistory() {
       score.textContent = `${entry.score}%`;
 
       card.append(title, detail, score);
-
       historyList.appendChild(card);
     });
 
   } catch (error) {
-    console.error(
-      "Riwayat tidak dapat dibaca:",
-      error
-    );
-
+    console.error("Riwayat tidak dapat dibaca:", error);
     historyEmpty.hidden = false;
     historyList.hidden = true;
   }
@@ -752,8 +610,7 @@ function returnToGenerator() {
     quizSection.hidden = true;
   }
 
-  const generatorSection =
-    document.getElementById("buat-latihan");
+  const generatorSection = document.getElementById("buat-latihan");
 
   if (generatorSection) {
     generatorSection.scrollIntoView({
@@ -773,7 +630,7 @@ if (backToGenerator) {
 
 
 // ========================================
-// 19. REAL AI INTEGRATION
+// 19. DIRECT OPENAI AI INTEGRATION (CLIENT-SIDE)
 // ========================================
 
 if (generatorForm) {
@@ -781,88 +638,95 @@ if (generatorForm) {
     event.preventDefault();
 
     const settings = getStudySettings();
-
     if (!settings) return;
 
     if (settings.jenisSoal !== "pilihan-ganda") {
-      showFormStatus(
-        "Untuk sementara pilih jenis soal pilihan ganda.",
-        "error"
-      );
-
+      showFormStatus("Untuk sementara pilih jenis soal pilihan ganda.", "error");
       return;
     }
 
     if (!generateButton) {
-      showFormStatus(
-        "Tombol buat latihan tidak ditemukan.",
-        "error"
-      );
-
+      showFormStatus("Tombol buat latihan tidak ditemukan.", "error");
       return;
     }
 
-    const originalButtonContent =
-      generateButton.innerHTML;
+    if (OPENAI_API_KEY.includes("MASUKKAN_API_KEY")) {
+      showFormStatus("API Key OpenAI belum diisi di file script.js!", "error");
+      return;
+    }
+
+    const originalButtonContent = generateButton.innerHTML;
 
     try {
       generateButton.disabled = true;
-      generateButton.textContent =
-        "AI sedang membuat soal...";
+      generateButton.textContent = "AI sedang membuat soal...";
 
       showFormStatus(
-        "Sedang menganalisis materi dan menyusun soal. Mohon tunggu.",
+        "Sedang menganalisis materi dan menyusun soal. Mohon tunggu sebentar...",
         "info"
       );
 
-      const response = await fetch("/api/generate-quiz", {
+      const promptSystem = `
+Kamu adalah StudyLab AI, pembuat latihan soal pendidikan untuk pelajar.
+Tugasmu membuat latihan soal pilihan ganda dalam format JSON murni tanpa teks pembuka/penutup.
+Struktur JSON harus berupa objek dengan key "questions" yang berisi array objek soal:
+{
+  "questions": [
+    {
+      "question": "Pertanyaan soal di sini?",
+      "options": ["Pilihan A", "Pilihan B", "Pilihan C", "Pilihan D"],
+      "answer": 0,
+      "explanation": "Penjelasan jawaban benar."
+    }
+  ]
+}
+Ketentuan:
+- Gunakan bahasa Indonesia.
+- "answer" harus berupa nomor indeks integer 0, 1, 2, atau 3.
+- Buat tepat ${settings.jumlahSoal} soal.
+- Tingkat kesulitan: ${settings.kesulitan}.
+`;
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
-
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${OPENAI_API_KEY}`
         },
-
-        body: JSON.stringify(settings)
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: promptSystem },
+            { role: "user", content: `Materi:\n${settings.materi}` }
+          ],
+          temperature: 0.7
+        })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.error || "Terjadi kesalahan saat membuat soal."
-        );
+        throw new Error(data.error?.message || "Gagal terhubung ke OpenAI API.");
       }
 
-      if (
-        !data.success ||
-        !Array.isArray(data.questions)
-      ) {
-        throw new Error(
-          "Format soal dari server tidak valid."
-        );
+      const result = JSON.parse(data.choices[0].message.content);
+
+      if (!result || !Array.isArray(result.questions)) {
+        throw new Error("Format soal dari AI tidak sesuai.");
       }
 
-      const quizStarted = startQuiz(
-        data.questions,
-        settings
-      );
+      const quizStarted = startQuiz(result.questions, settings);
 
       if (!quizStarted) return;
 
       window.studyLabSettings = settings;
 
-      showFormStatus(
-        "Latihan berhasil dibuat. Selamat mengerjakan!",
-        "success"
-      );
+      showFormStatus("Latihan berhasil dibuat. Selamat mengerjakan!", "success");
 
     } catch (error) {
       console.error("Generator error:", error);
-
-      showFormStatus(
-        error.message || "Gagal membuat soal. Coba kembali.",
-        "error"
-      );
+      showFormStatus(error.message || "Gagal membuat soal. Coba kembali.", "error");
 
     } finally {
       generateButton.disabled = false;
