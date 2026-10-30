@@ -1,0 +1,1189 @@
+
+/* =================================
+   STUDYLAB AI
+   PART 3A - BASE & TYPOGRAPHY
+================================= */
+
+/* 1. CSS VARIABLES */
+
+:root {
+    --bg-primary: #080d1a;
+    --bg-secondary: #0d1528;
+    --bg-card: #111c33;
+
+    --blue-primary: #2878ff;
+    --blue-light: #58a6ff;
+    --blue-glow: rgba(40, 120, 255, 0.18);
+
+    --text-primary: #f4f7ff;
+    --text-secondary: #a5b1c8;
+    --text-muted: #71809b;
+
+    --border-color: rgba(255, 255, 255, 0.09);
+
+    --success: #35c98a;
+    --danger: #ff647c;
+
+    --font-main: "Inter", "Segoe UI", sans-serif;
+
+    --radius-small: 8px;
+    --radius-medium: 14px;
+    --radius-large: 22px;
+
+    --transition: 0.25s ease;
+}
+
+/* 2. RESET */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 85px;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: clip;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* 3. TYPOGRAPHY */
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    letter-spacing: -2px;
+}
+
+h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -1px;
+}
+
+h3 {
+    font-size: 1.25rem;
+}
+
+p {
+    color: var(--text-secondary);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+button, input, textarea, select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: var(--transition);
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 4. FORM BASE */
+
+input, textarea, select {
+    width: 100%;
+    max-width: 100%;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-small);
+
+    padding: 12px 14px;
+    outline: none;
+
+    transition: var(--transition);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--blue-primary);
+    box-shadow: 0 0 0 3px var(--blue-glow);
+}
+
+select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* 5. ACCESSIBILITY */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--blue-light);
+    outline-offset: 4px;
+}
+
+::selection {
+    background: var(--blue-primary);
+    color: white;
+}
+
+/* 6. SCROLLBAR */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #263653;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--blue-primary);
+}
+
+
+/* =================================
+   STUDYLAB AI
+   PART 3B - LAYOUT & COMPONENTS
+================================= */
+
+/* 1. GLOBAL CONTAINER */
+
+.container {
+    width: min(1120px, 90%);
+    margin: 0 auto;
+}
+
+section {
+    position: relative;
+    padding: 100px 0;
+}
+
+.section-heading {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 50px;
+}
+
+.section-heading h2 {
+    margin-bottom: 16px;
+}
+
+.section-description {
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+/* 2. HEADER & NAVBAR */
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    background: rgba(8, 13, 26, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar {
+    position: relative;
+    width: min(1200px, 90%);
+    min-height: 78px;
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.brand-icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    background: linear-gradient(
+        135deg,
+        var(--blue-primary),
+        #1452c5
+    );
+
+    color: white;
+    border-radius: 11px;
+}
+
+.brand-accent {
+    color: var(--blue-light);
+}
+
+#navLinks {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--blue-light);
+}
+
+.nav-cta {
+    padding: 10px 19px;
+    border-radius: var(--radius-small);
+
+    color: white;
+    background: var(--blue-primary);
+
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.nav-cta:hover {
+    background: #1765e8;
+    transform: translateY(-2px);
+}
+
+/* 3. MOBILE MENU */
+
+#menuToggle {
+    display: none;
+
+    width: 42px;
+    height: 42px;
+
+    color: white;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-small);
+
+    font-size: 1.3rem;
+}
+
+/* 4. HERO SECTION */
+
+.hero {
+    min-height: 650px;
+    padding: 110px 0;
+
+    display: flex;
+    align-items: center;
+
+    background:
+        radial-gradient(
+            ellipse at 80% 30%,
+            rgba(40, 120, 255, 0.13),
+            transparent 40%
+        ),
+        var(--bg-primary);
+}
+
+.hero-content {
+    width: min(1200px, 90%);
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 70px;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 8px 14px;
+    margin-bottom: 25px;
+
+    color: var(--blue-light);
+    background: rgba(40, 120, 255, 0.1);
+    border: 1px solid rgba(40, 120, 255, 0.25);
+    border-radius: 50px;
+
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.hero-content h1 {
+    max-width: 650px;
+    margin-bottom: 24px;
+}
+
+.hero-content h1 span {
+    color: var(--blue-light);
+}
+
+.hero-description {
+    max-width: 530px;
+    margin-bottom: 32px;
+
+    font-size: 1.05rem;
+    line-height: 1.9;
+}
+
+.hero-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.button-primary,
+.button-secondary {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 14px 23px;
+    border-radius: var(--radius-small);
+
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    transition: var(--transition);
+}
+
+.button-primary {
+    color: white;
+    background: var(--blue-primary);
+    box-shadow: 0 8px 25px rgba(40, 120, 255, 0.2);
+}
+
+.button-primary:hover {
+    background: #1765e8;
+    transform: translateY(-3px);
+}
+
+.button-secondary {
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.button-secondary:hover {
+    border-color: var(--blue-primary);
+    background: var(--blue-glow);
+}
+
+.hero-visual {
+    min-height: 350px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+}
+
+/* 5. GENERATOR SECTION */
+
+.generator-section {
+    background: var(--bg-secondary);
+}
+
+.generator-section .section-heading {
+    margin-bottom: 40px;
+}
+
+#generatorForm {
+    width: min(760px, 100%);
+    margin: 0 auto;
+    min-width: 0;
+
+    padding: 35px;
+
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-large);
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+#generatorForm label {
+    display: block;
+    margin-bottom: 9px;
+
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+#materiInput {
+    min-height: 190px;
+    line-height: 1.7;
+}
+
+#characterCount {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-align: right;
+}
+
+#questionType,
+#questionCount,
+#difficulty {
+    margin-bottom: 22px;
+}
+
+.generate-button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 16px;
+
+    color: white;
+    background: linear-gradient(
+        135deg,
+        var(--blue-primary),
+        #1555c7
+    );
+
+    border-radius: var(--radius-small);
+    font-size: 1rem;
+    font-weight: 700;
+
+    box-shadow: 0 8px 25px rgba(40, 120, 255, 0.17);
+}
+
+.generate-button:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(40, 120, 255, 0.28);
+}
+
+#formStatus {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* 6. FEATURES SECTION */
+
+.features-section {
+    background: var(--bg-primary);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.feature-item {
+    min-width: 0;
+    padding: 30px;
+
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-medium);
+
+    transition: var(--transition);
+}
+
+.feature-item:hover {
+    transform: translateY(-6px);
+    border-color: rgba(40, 120, 255, 0.5);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.feature-item h3 {
+    margin: 20px 0 12px;
+}
+
+.feature-item p {
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+
+/* 7. RESULTS SECTION */
+
+.results-section {
+    background: var(--bg-secondary);
+}
+
+.results-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 55px;
+}
+
+.results-preview {
+    min-width: 0;
+    padding: 30px;
+
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-large);
+}
+
+.results-preview h3 {
+    margin-bottom: 20px;
+}
+
+.results-preview p {
+    line-height: 1.8;
+}
+
+/* 8. QUIZ SECTION */
+
+.quiz-section {
+    background: var(--bg-primary);
+}
+
+.quiz-section > .container {
+    width: min(850px, 90%);
+}
+
+.quiz-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+#quizTitle {
+    margin-bottom: 12px;
+}
+
+#quizDescription {
+    color: var(--text-secondary);
+}
+
+.quiz-progress {
+    margin: 25px 0;
+}
+
+#questionProgress,
+#answeredProgress {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+#quizProgressBar {
+    height: 8px;
+    margin-top: 12px;
+    overflow: hidden;
+    background: var(--bg-card);
+    border-radius: 20px;
+}
+
+#quizProgressFill {
+    width: 0%;
+    height: 100%;
+    background: var(--blue-primary);
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+#quizCard,
+#quizResult {
+    min-width: 0;
+    padding: 35px;
+
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-large);
+}
+
+#questionLabel {
+    display: inline-block;
+    margin-bottom: 15px;
+
+    color: var(--blue-light);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+#questionText {
+    margin-bottom: 25px;
+    font-size: 1.3rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+#answerOptions {
+    display: grid;
+    gap: 13px;
+}
+
+.answer-option {
+    width: 100%;
+    padding: 16px;
+
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-small);
+
+    text-align: left;
+    line-height: 1.5;
+
+    transition: var(--transition);
+}
+
+.answer-option:hover:not(:disabled) {
+    border-color: var(--blue-primary);
+    color: white;
+}
+
+.answer-option.selected {
+    color: white;
+    border-color: var(--blue-primary);
+    background: var(--blue-glow);
+}
+
+#answerFeedback {
+    margin-top: 20px;
+    line-height: 1.7;
+}
+
+.quiz-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+#previousQuestion,
+#nextQuestion,
+#exitQuiz,
+#retryQuiz,
+#backToGenerator {
+    padding: 12px 20px;
+    border-radius: var(--radius-small);
+    font-weight: 600;
+}
+
+#previousQuestion,
+#exitQuiz,
+#backToGenerator {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+#nextQuestion,
+#retryQuiz {
+    color: white;
+    background: var(--blue-primary);
+}
+
+#previousQuestion:hover,
+#exitQuiz:hover,
+#backToGenerator:hover {
+    border-color: var(--blue-primary);
+}
+
+#nextQuestion:hover,
+#retryQuiz:hover {
+    background: #1765e8;
+}
+
+#quizResult {
+    text-align: center;
+}
+
+#finalScore {
+    margin: 25px 0;
+    color: var(--blue-light);
+    font-size: 3.5rem;
+    font-weight: 800;
+}
+
+#resultSummary {
+    margin-bottom: 25px;
+}
+
+#answerReview {
+    margin-top: 35px;
+    text-align: left;
+}
+
+.review-item {
+    padding: 20px;
+    margin-bottom: 15px;
+
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-medium);
+}
+
+.review-item h4 {
+    margin-bottom: 12px;
+}
+
+.review-item p {
+    margin-top: 8px;
+    line-height: 1.7;
+}
+
+/* 9. HISTORY SECTION */
+
+.history-section {
+    background: var(--bg-secondary);
+}
+
+#historyEmpty {
+    padding: 35px;
+    text-align: center;
+
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-medium);
+}
+
+#historyList {
+    display: grid;
+    gap: 15px;
+}
+
+.history-item {
+    min-width: 0;
+    padding: 22px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-medium);
+}
+
+.history-item h3 {
+    margin-bottom: 7px;
+}
+
+.history-item p {
+    font-size: 0.85rem;
+}
+
+/* 10. FINAL CTA */
+
+.final-cta {
+    margin: 70px auto;
+    width: min(1120px, 90%);
+    padding: 65px 30px;
+
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at top,
+            rgba(40, 120, 255, 0.2),
+            transparent 65%
+        ),
+        var(--bg-card);
+
+    border: 1px solid rgba(40, 120, 255, 0.25);
+    border-radius: var(--radius-large);
+}
+
+#finalCtaTitle {
+    margin-bottom: 18px;
+}
+
+.final-cta p {
+    max-width: 600px;
+    margin: 0 auto 25px;
+}
+
+/* 11. FOOTER */
+
+.site-footer {
+    padding: 35px 5%;
+    text-align: center;
+    background: #060a14;
+    border-top: 1px solid var(--border-color);
+}
+
+.site-footer p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+
+/* =================================
+   STUDYLAB AI
+   PART 3C - RESPONSIVE DESIGN
+================================= */
+
+/* 1. TABLET */
+
+@media (max-width: 1024px) {
+
+    .hero-content {
+        gap: 35px;
+    }
+
+    .hero-content h1 {
+        font-size: 3.2rem;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .results-content {
+        gap: 30px;
+    }
+
+    section {
+        padding: 80px 0;
+    }
+}
+
+/* 2. MOBILE NAVIGATION */
+
+@media (max-width: 768px) {
+
+    .navbar {
+        min-height: 70px;
+    }
+
+    #menuToggle {
+        display: grid;
+        place-items: center;
+    }
+
+    #navLinks {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+
+        padding: 12px 5% 20px;
+
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    #navLinks.active {
+        display: flex;
+    }
+
+    #navLinks a {
+        display: block;
+        padding: 13px 0;
+    }
+
+    /* HERO */
+
+    .hero {
+        min-height: auto;
+        padding: 80px 0;
+    }
+
+    .hero-content {
+        width: 90%;
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 35px;
+    }
+
+    .hero-content h1,
+    .hero-description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(2.4rem, 9vw, 3.4rem);
+    }
+
+    .hero-actions {
+        justify-content: center;
+    }
+
+    .hero-visual {
+        min-height: 220px;
+    }
+
+    /* GENERATOR */
+
+    #generatorForm {
+        width: 100%;
+        padding: 25px 20px;
+    }
+
+    /* FEATURES */
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-item {
+        padding: 25px;
+    }
+
+    /* RESULTS */
+
+    .results-content {
+        grid-template-columns: 1fr;
+    }
+
+    /* QUIZ */
+
+    #quizCard,
+    #quizResult {
+        padding: 25px 20px;
+    }
+
+    #questionText {
+        font-size: 1.1rem;
+    }
+
+    .quiz-navigation {
+        flex-wrap: wrap;
+    }
+
+    .quiz-navigation button {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* HISTORY */
+
+    .history-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    /* SECTIONS */
+
+    section {
+        padding: 70px 0;
+    }
+
+    .section-heading {
+        width: 90%;
+        margin-bottom: 35px;
+    }
+
+    .final-cta {
+        padding: 45px 20px;
+    }
+}
+
+/* 3. SMALL MOBILE */
+
+@media (max-width: 480px) {
+
+    .container,
+    .hero-content {
+        width: 90%;
+    }
+
+    .brand {
+        font-size: 1.1rem;
+    }
+
+    .brand-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .hero-content h1 {
+        font-size: 2.35rem;
+        letter-spacing: -1.5px;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-actions a {
+        width: 100%;
+    }
+
+    #generatorForm {
+        padding: 20px 16px;
+    }
+
+    #materiInput {
+        min-height: 160px;
+    }
+
+    .quiz-navigation {
+        flex-direction: column;
+    }
+
+    .quiz-navigation button {
+        width: 100%;
+        flex: auto;
+    }
+
+    #finalScore {
+        font-size: 2.8rem;
+    }
+
+    .section-heading h2 {
+        font-size: 1.9rem;
+    }
+
+    .final-cta {
+        width: 90%;
+    }
+}
+
+
+/* =================================
+   STUDYLAB AI
+   PART 3D - ANIMATIONS
+================================= */
+
+/* 1. HERO ANIMATION */
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-badge {
+    animation: fadeUp 0.7s ease both;
+}
+
+.hero-content h1 {
+    animation: fadeUp 0.8s ease both;
+}
+
+.hero-description {
+    animation: fadeUp 0.9s ease both;
+}
+
+.hero-actions {
+    animation: fadeUp 1s ease both;
+}
+
+/* 2. FLOATING EFFECT */
+
+@keyframes floating {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.hero-visual {
+    animation: floating 4s ease-in-out infinite;
+}
+
+/* 3. BUTTON EFFECT */
+
+.button-primary,
+.button-secondary,
+.generate-button {
+    transition:
+        transform 0.25s ease,
+        background 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+/* 4. CARD EFFECT */
+
+.feature-item,
+.results-preview,
+.review-item,
+.history-item {
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+/* 5. REDUCE MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation: none !important;
+        transition: none !important;
+    }
+}

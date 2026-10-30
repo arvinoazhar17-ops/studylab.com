@@ -1,0 +1,881 @@
+"use strict";
+
+// ========================================
+// STUDYLAB AI — CORE FUNCTIONALITY
+// PART 2A + PART 2B + PART 2C
+// ========================================
+
+
+// ========================================
+// 1. ELEMENT REFERENCES
+// ========================================
+
+const menuToggle = document.getElementById("menuToggle");
+const navLinks = document.getElementById("navLinks");
+
+const generatorForm = document.getElementById("generatorForm");
+const materiInput = document.getElementById("materiInput");
+const characterCount = document.getElementById("characterCount");
+
+const questionType = document.getElementById("questionType");
+const questionCount = document.getElementById("questionCount");
+const difficulty = document.getElementById("difficulty");
+
+const generateButton = document.querySelector(".generate-button");
+
+let formStatus = document.getElementById("formStatus");
+
+
+// ========================================
+// 2. MOBILE NAVIGATION
+// ========================================
+
+function closeMobileMenu() {
+  if (!menuToggle || !navLinks) return;
+
+  menuToggle.setAttribute("aria-expanded", "false");
+  menuToggle.setAttribute("aria-label", "Buka menu navigasi");
+
+  // Disesuaikan dengan CSS.
+  navLinks.classList.remove("active");
+  menuToggle.classList.remove("is-active");
+}
+
+function toggleMobileMenu() {
+  if (!menuToggle || !navLinks) return;
+
+  const isExpanded =
+    menuToggle.getAttribute("aria-expanded") === "true";
+
+  menuToggle.setAttribute("aria-expanded", String(!isExpanded));
+
+  menuToggle.setAttribute(
+    "aria-label",
+    isExpanded ? "Buka menu navigasi" : "Tutup menu navigasi"
+  );
+
+  navLinks.classList.toggle("active", !isExpanded);
+  menuToggle.classList.toggle("is-active", !isExpanded);
+}
+
+if (menuToggle && navLinks) {
+  menuToggle.addEventListener("click", toggleMobileMenu);
+
+  navLinks.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMobileMenu);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeMobileMenu();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 767) {
+      closeMobileMenu();
+    }
+  });
+}
+
+
+// ========================================
+// 3. NAVIGATION ACTIVE STATE
+// ========================================
+
+const allNavLinks = document.querySelectorAll(
+  '.nav-links a[href^="#"]'
+);
+
+allNavLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    allNavLinks.forEach((item) => {
+      item.classList.remove("active");
+    });
+
+    link.classList.add("active");
+  });
+});
+
+
+// ========================================
+// 4. CHARACTER COUNTER
+// ========================================
+
+function updateCharacterCount() {
+  if (!materiInput || !characterCount) return;
+
+  const totalCharacters = materiInput.value.length;
+
+  characterCount.textContent =
+    `${totalCharacters.toLocaleString("id-ID")} karakter`;
+
+  characterCount.classList.toggle(
+    "is-empty",
+    totalCharacters === 0
+  );
+
+  characterCount.classList.toggle(
+    "is-valid",
+    totalCharacters >= 20
+  );
+}
+
+if (materiInput) {
+  materiInput.addEventListener("input", updateCharacterCount);
+  updateCharacterCount();
+}
+
+
+// ========================================
+// 5. FORM STATUS
+// ========================================
+
+if (generatorForm && !formStatus) {
+  formStatus = document.createElement("p");
+
+  formStatus.id = "formStatus";
+  formStatus.className = "form-status";
+  formStatus.setAttribute("role", "status");
+  formStatus.setAttribute("aria-live", "polite");
+
+  generatorForm.appendChild(formStatus);
+}
+
+function showFormStatus(message, type = "info") {
+  if (!formStatus) return;
+
+  formStatus.textContent = message;
+  formStatus.dataset.status = type;
+}
+
+
+// ========================================
+// 6. VALIDATE STUDY SETTINGS
+// ========================================
+
+function getStudySettings() {
+  if (
+    !materiInput ||
+    !questionType ||
+    !questionCount ||
+    !difficulty
+  ) {
+    showFormStatus(
+      "Form latihan tidak ditemukan. Periksa kembali HTML.",
+      "error"
+    );
+
+    return null;
+  }
+
+  const materi = materiInput.value.trim();
+
+  if (materi.length < 20) {
+    showFormStatus(
+      "Masukkan materi minimal 20 karakter.",
+      "error"
+    );
+
+    materiInput.focus();
+    return null;
+  }
+
+  if (materi.length > 15000) {
+    showFormStatus(
+      "Materi terlalu panjang. Maksimal 15.000 karakter.",
+      "error"
+    );
+
+    materiInput.focus();
+    return null;
+  }
+
+  const jumlahSoal = Number(questionCount.value);
+
+  if (![5, 10, 15, 20].includes(jumlahSoal)) {
+    showFormStatus(
+      "Jumlah soal tidak valid.",
+      "error"
+    );
+
+    return null;
+  }
+
+  return {
+    materi,
+    jenisSoal: questionType.value,
+    jumlahSoal,
+    kesulitan: difficulty.value
+  };
+}
+
+
+// ========================================
+// 7. QUIZ ELEMENT REFERENCES
+// ========================================
+
+const quizSection = document.getElementById("area-kuis");
+const quizCard = document.getElementById("quizCard");
+const quizResult = document.getElementById("quizResult");
+
+const questionText = document.getElementById("questionText");
+const questionLabel = document.getElementById("questionLabel");
+
+const answerOptions = document.getElementById("answerOptions");
+const answerFeedback = document.getElementById("answerFeedback");
+
+const questionProgress = document.getElementById("questionProgress");
+const answeredProgress = document.getElementById("answeredProgress");
+
+const quizProgressBar = document.getElementById("quizProgressBar");
+const quizProgressFill = document.getElementById("quizProgressFill");
+
+const previousQuestion = document.getElementById("previousQuestion");
+const nextQuestion = document.getElementById("nextQuestion");
+
+const exitQuiz = document.getElementById("exitQuiz");
+const retryQuiz = document.getElementById("retryQuiz");
+const backToGenerator = document.getElementById("backToGenerator");
+
+const finalScore = document.getElementById("finalScore");
+const resultSummary = document.getElementById("resultSummary");
+const answerReview = document.getElementById("answerReview");
+
+
+// ========================================
+// 8. QUIZ VARIABLES
+// ========================================
+
+let quizQuestions = [];
+let currentQuestionIndex = 0;
+let userAnswers = [];
+let quizSettings = null;
+let quizFinished = false;
+
+
+// ========================================
+// 9. VALIDATE QUESTION DATA
+// ========================================
+
+function validateQuestions(questions) {
+  if (!Array.isArray(questions) || questions.length === 0) {
+    throw new Error("Data soal belum tersedia.");
+  }
+
+  questions.forEach((question, index) => {
+    if (
+      typeof question.question !== "string" ||
+      !question.question.trim()
+    ) {
+      throw new Error(
+        `Pertanyaan nomor ${index + 1} tidak valid.`
+      );
+    }
+
+    if (
+      !Array.isArray(question.options) ||
+      question.options.length !== 4
+    ) {
+      throw new Error(
+        `Soal nomor ${index + 1} harus memiliki 4 pilihan.`
+      );
+    }
+
+    if (
+      !question.options.every(
+        option => typeof option === "string" && option.trim()
+      )
+    ) {
+      throw new Error(
+        `Pilihan soal nomor ${index + 1} tidak valid.`
+      );
+    }
+
+    if (
+      !Number.isInteger(question.answer) ||
+      question.answer < 0 ||
+      question.answer > 3
+    ) {
+      throw new Error(
+        `Kunci jawaban nomor ${index + 1} tidak valid.`
+      );
+    }
+
+    if (
+      typeof question.explanation !== "string"
+    ) {
+      throw new Error(
+        `Pembahasan soal nomor ${index + 1} tidak valid.`
+      );
+    }
+  });
+
+  return true;
+}
+
+
+// ========================================
+// 10. START QUIZ
+// ========================================
+
+function startQuiz(questions, settings = {}) {
+  try {
+    if (
+      !quizSection ||
+      !quizCard ||
+      !quizResult
+    ) {
+      throw new Error("Bagian kuis tidak ditemukan di HTML.");
+    }
+
+    validateQuestions(questions);
+
+    quizQuestions = questions.map(question => ({
+      question: question.question.trim(),
+      options: [...question.options],
+      answer: question.answer,
+      explanation: question.explanation || ""
+    }));
+
+    quizSettings = settings;
+
+    currentQuestionIndex = 0;
+    userAnswers = Array(quizQuestions.length).fill(null);
+
+    quizFinished = false;
+
+    quizSection.hidden = false;
+    quizCard.hidden = false;
+    quizResult.hidden = true;
+
+    const quizTitle = document.getElementById("quizTitle");
+    const quizDescription = document.getElementById("quizDescription");
+
+    if (quizTitle) {
+      quizTitle.textContent =
+        "Latihan " + (settings.jenisSoal || "soal");
+    }
+
+    if (quizDescription) {
+      quizDescription.textContent =
+        `${quizQuestions.length} soal · ${settings.kesulitan || "Latihan mandiri"}`;
+    }
+
+    renderQuestion();
+
+    quizSection.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    return true;
+
+  } catch (error) {
+    console.error("Quiz error:", error);
+    showFormStatus(error.message, "error");
+
+    return false;
+  }
+}
+
+
+// ========================================
+// 11. RENDER CURRENT QUESTION
+// ========================================
+
+function renderQuestion() {
+  if (
+    !quizQuestions.length ||
+    quizFinished
+  ) {
+    return;
+  }
+
+  if (
+    !questionText ||
+    !questionLabel ||
+    !answerOptions ||
+    !answerFeedback ||
+    !questionProgress ||
+    !answeredProgress ||
+    !previousQuestion ||
+    !nextQuestion
+  ) {
+    showFormStatus(
+      "Elemen kuis belum lengkap. Periksa HTML.",
+      "error"
+    );
+
+    return;
+  }
+
+  const question = quizQuestions[currentQuestionIndex];
+  const selectedAnswer = userAnswers[currentQuestionIndex];
+
+  questionLabel.textContent =
+    `PERTANYAAN ${String(currentQuestionIndex + 1).padStart(2, "0")}`;
+
+  questionText.textContent = question.question;
+
+  answerOptions.replaceChildren();
+
+  question.options.forEach((option, index) => {
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "answer-option";
+
+    button.textContent =
+      `${String.fromCharCode(65 + index)}. ${option}`;
+
+    button.setAttribute(
+      "aria-pressed",
+      String(selectedAnswer === index)
+    );
+
+    if (selectedAnswer === index) {
+      button.classList.add("is-selected");
+    }
+
+    button.addEventListener("click", () => {
+      if (quizFinished) return;
+
+      userAnswers[currentQuestionIndex] = index;
+
+      renderQuestion();
+    });
+
+    answerOptions.appendChild(button);
+  });
+
+  const answered = userAnswers.filter(
+    answer => answer !== null
+  ).length;
+
+  questionProgress.textContent =
+    `Soal ${currentQuestionIndex + 1} dari ${quizQuestions.length}`;
+
+  answeredProgress.textContent =
+    `${answered} dijawab`;
+
+  const progress =
+    ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
+
+  if (quizProgressFill) {
+    quizProgressFill.style.width = `${progress}%`;
+  }
+
+  if (quizProgressBar) {
+    quizProgressBar.setAttribute(
+      "aria-valuenow",
+      String(Math.round(progress))
+    );
+  }
+
+  previousQuestion.disabled =
+    currentQuestionIndex === 0;
+
+  nextQuestion.textContent =
+    currentQuestionIndex === quizQuestions.length - 1
+      ? "Selesaikan latihan"
+      : "Berikutnya";
+
+  answerFeedback.textContent =
+    selectedAnswer === null
+      ? "Pilih jawaban yang menurutmu benar."
+      : "Jawaban tersimpan.";
+}
+
+
+// ========================================
+// 12. NAVIGATE QUESTIONS
+// ========================================
+
+if (previousQuestion) {
+  previousQuestion.addEventListener("click", () => {
+    if (
+      currentQuestionIndex > 0 &&
+      !quizFinished
+    ) {
+      currentQuestionIndex--;
+      renderQuestion();
+    }
+  });
+}
+
+if (nextQuestion) {
+  nextQuestion.addEventListener("click", () => {
+    if (quizFinished) return;
+
+    if (userAnswers[currentQuestionIndex] === null) {
+      if (answerFeedback) {
+        answerFeedback.textContent =
+          "Pilih jawaban terlebih dahulu sebelum melanjutkan.";
+      }
+
+      return;
+    }
+
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      currentQuestionIndex++;
+      renderQuestion();
+    } else {
+      finishQuiz();
+    }
+  });
+}
+
+
+// ========================================
+// 13. CALCULATE RESULTS
+// ========================================
+
+function finishQuiz() {
+  if (quizFinished || !quizQuestions.length) return;
+
+  quizFinished = true;
+
+  const correct = quizQuestions.filter(
+    (question, index) =>
+      userAnswers[index] === question.answer
+  ).length;
+
+  const total = quizQuestions.length;
+
+  const score = Math.round(
+    (correct / total) * 100
+  );
+
+  if (quizCard) quizCard.hidden = true;
+  if (quizResult) quizResult.hidden = false;
+
+  if (finalScore) {
+    finalScore.textContent = `${score}%`;
+  }
+
+  if (resultSummary) {
+    resultSummary.textContent =
+      `Kamu menjawab ${correct} dari ${total} soal dengan benar.`;
+  }
+
+  renderAnswerReview();
+
+  saveQuizHistory({
+    date: new Date().toISOString(),
+    subject: quizSettings?.materi?.slice(0, 80) || "Latihan mandiri",
+    score,
+    correct,
+    total
+  });
+
+  if (quizResult) {
+    quizResult.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+}
+
+
+// ========================================
+// 14. ANSWER REVIEW
+// ========================================
+
+function renderAnswerReview() {
+  if (!answerReview) return;
+
+  answerReview.replaceChildren();
+
+  quizQuestions.forEach((question, index) => {
+    const item = document.createElement("article");
+
+    const heading = document.createElement("h4");
+    const userAnswer = document.createElement("p");
+    const correctAnswer = document.createElement("p");
+    const explanation = document.createElement("p");
+
+    const isCorrect =
+      userAnswers[index] === question.answer;
+
+    item.className = "answer-review-item";
+
+    heading.textContent =
+      `${index + 1}. ${question.question}`;
+
+    userAnswer.textContent =
+      `Jawabanmu: ${
+        userAnswers[index] === null
+          ? "Tidak dijawab"
+          : question.options[userAnswers[index]]
+      }`;
+
+    correctAnswer.textContent =
+      `Jawaban benar: ${question.options[question.answer]}`;
+
+    explanation.textContent =
+      question.explanation
+        ? `Pembahasan: ${question.explanation}`
+        : "Pembahasan belum tersedia.";
+
+    item.classList.add(
+      isCorrect ? "is-correct" : "is-incorrect"
+    );
+
+    item.append(
+      heading,
+      userAnswer,
+      correctAnswer,
+      explanation
+    );
+
+    answerReview.appendChild(item);
+  });
+}
+
+
+// ========================================
+// 15. SAVE QUIZ HISTORY
+// ========================================
+
+function saveQuizHistory(entry) {
+  try {
+    const history = JSON.parse(
+      localStorage.getItem("studylab-history") || "[]"
+    );
+
+    if (!Array.isArray(history)) {
+      throw new Error("Format riwayat tidak valid.");
+    }
+
+    history.unshift(entry);
+
+    localStorage.setItem(
+      "studylab-history",
+      JSON.stringify(history.slice(0, 30))
+    );
+
+    renderQuizHistory();
+
+  } catch (error) {
+    console.error(
+      "Riwayat tidak dapat disimpan:",
+      error
+    );
+  }
+}
+
+
+// ========================================
+// 16. RENDER QUIZ HISTORY
+// ========================================
+
+function renderQuizHistory() {
+  const historyList =
+    document.getElementById("historyList");
+
+  const historyEmpty =
+    document.getElementById("historyEmpty");
+
+  if (!historyList || !historyEmpty) return;
+
+  try {
+    const history = JSON.parse(
+      localStorage.getItem("studylab-history") || "[]"
+    );
+
+    historyList.replaceChildren();
+
+    if (!Array.isArray(history) || history.length === 0) {
+      historyEmpty.hidden = false;
+      historyList.hidden = true;
+
+      return;
+    }
+
+    historyEmpty.hidden = true;
+    historyList.hidden = false;
+
+    history.forEach(entry => {
+      const card = document.createElement("article");
+
+      const title = document.createElement("h3");
+      const detail = document.createElement("p");
+      const score = document.createElement("strong");
+
+      card.className = "history-item";
+
+      title.textContent = entry.subject || "Latihan mandiri";
+
+      detail.textContent =
+        `${entry.correct}/${entry.total} jawaban benar · ` +
+        new Date(entry.date).toLocaleDateString("id-ID");
+
+      score.textContent = `${entry.score}%`;
+
+      card.append(title, detail, score);
+
+      historyList.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error(
+      "Riwayat tidak dapat dibaca:",
+      error
+    );
+
+    historyEmpty.hidden = false;
+    historyList.hidden = true;
+  }
+}
+
+
+// ========================================
+// 17. RETRY QUIZ
+// ========================================
+
+if (retryQuiz) {
+  retryQuiz.addEventListener("click", () => {
+    if (quizQuestions.length) {
+      startQuiz(quizQuestions, quizSettings || {});
+    }
+  });
+}
+
+
+// ========================================
+// 18. EXIT QUIZ
+// ========================================
+
+function returnToGenerator() {
+  if (quizSection) {
+    quizSection.hidden = true;
+  }
+
+  const generatorSection =
+    document.getElementById("buat-latihan");
+
+  if (generatorSection) {
+    generatorSection.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+}
+
+if (exitQuiz) {
+  exitQuiz.addEventListener("click", returnToGenerator);
+}
+
+if (backToGenerator) {
+  backToGenerator.addEventListener("click", returnToGenerator);
+}
+
+
+// ========================================
+// 19. REAL AI INTEGRATION
+// ========================================
+
+if (generatorForm) {
+  generatorForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const settings = getStudySettings();
+
+    if (!settings) return;
+
+    if (settings.jenisSoal !== "pilihan-ganda") {
+      showFormStatus(
+        "Untuk sementara pilih jenis soal pilihan ganda.",
+        "error"
+      );
+
+      return;
+    }
+
+    if (!generateButton) {
+      showFormStatus(
+        "Tombol buat latihan tidak ditemukan.",
+        "error"
+      );
+
+      return;
+    }
+
+    const originalButtonContent =
+      generateButton.innerHTML;
+
+    try {
+      generateButton.disabled = true;
+      generateButton.textContent =
+        "AI sedang membuat soal...";
+
+      showFormStatus(
+        "Sedang menganalisis materi dan menyusun soal. Mohon tunggu.",
+        "info"
+      );
+
+      const response = await fetch("/api/generate-quiz", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(settings)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Terjadi kesalahan saat membuat soal."
+        );
+      }
+
+      if (
+        !data.success ||
+        !Array.isArray(data.questions)
+      ) {
+        throw new Error(
+          "Format soal dari server tidak valid."
+        );
+      }
+
+      const quizStarted = startQuiz(
+        data.questions,
+        settings
+      );
+
+      if (!quizStarted) return;
+
+      window.studyLabSettings = settings;
+
+      showFormStatus(
+        "Latihan berhasil dibuat. Selamat mengerjakan!",
+        "success"
+      );
+
+    } catch (error) {
+      console.error("Generator error:", error);
+
+      showFormStatus(
+        error.message || "Gagal membuat soal. Coba kembali.",
+        "error"
+      );
+
+    } finally {
+      generateButton.disabled = false;
+      generateButton.innerHTML = originalButtonContent;
+    }
+  });
+}
+
+
+// ========================================
+// 20. INITIALIZE HISTORY
+// ========================================
+
+renderQuizHistory();
+
+console.log("StudyLab AI berhasil dimuat.");
